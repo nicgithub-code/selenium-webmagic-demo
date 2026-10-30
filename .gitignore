@@ -1,0 +1,19 @@
+# 编译产物
+target/
+
+# 抓取结果（每次运行都会重新生成）
+output/
+
+# IDE
+*.iml
+.idea/
+.vscode/
+
+# 系统
+.DS_Store
+
+# 本地项目数据（对话历史/规则等，不入库）
+.codebuddy/
+
+# 浏览器驱动（环境相关二进制，按需本地放置或用 Selenium Manager 自动下载）
+drivers/

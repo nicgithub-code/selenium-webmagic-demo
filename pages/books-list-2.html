@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>示例书店 · 图书列表 第 2 页（静态页面）</title>
+    <style>
+        body { font-family: "Microsoft YaHei", sans-serif; background: #f5f7fa; margin: 0; padding: 30px; }
+        h1 { color: #2c3e50; }
+        .tip { background: #fff8e1; border-left: 4px solid #ffc107; padding: 10px 14px; border-radius: 4px; color: #6d5b00; }
+        .book-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+        .book-card { background: #fff; border-radius: 10px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+        .book-card .title { margin: 0 0 8px; font-size: 18px; }
+        .book-card .title a { color: #2c3e50; text-decoration: none; }
+        .book-card .author { color: #7f8c8d; font-size: 14px; margin: 6px 0; }
+        .book-card .price { color: #e74c3c; font-weight: bold; font-size: 16px; margin: 6px 0; }
+        .book-card .score { color: #f39c12; font-size: 14px; margin: 6px 0; }
+        .tags { list-style: none; padding: 0; margin: 10px 0 0; }
+        .tags li { display: inline-block; background: #eef3f8; color: #557; font-size: 12px; padding: 3px 8px; border-radius: 10px; margin-right: 6px; }
+        .pagination { margin-top: 24px; }
+        .page-link { display: inline-block; padding: 8px 16px; background: #3498db; color: #fff; text-decoration: none; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+<h1>示例书店 · 图书列表（第 2 页）</h1>
+
+<p class="tip">
+    第 2 页。<strong>注意</strong>：这一页的分栏里同时放了"上一页"和"下一页"链接，
+    爬虫会发现 4 个链接（含重复的详情页链接），WebMagic 的 Scheduler 会自动去重，不会重复抓取。
+</p>
+
+<div class="book-list">
+
+    <div class="book-card" data-id="b4">
+        <h3 class="title"><a href="/book-detail?id=b4">XPath 从入门到精通</a></h3>
+        <p class="author">作者：王五</p>
+        <p class="price">价格：¥68.00</p>
+        <p class="score">评分：8.2</p>
+        <ul class="tags"><li>爬虫</li><li>XPath</li></ul>
+    </div>
+
+    <div class="book-card" data-id="b5">
+        <h3 class="title"><a href="/book-detail?id=b5">Selenium 自动化测试实战</a></h3>
+        <p class="author">作者：赵六</p>
+        <p class="price">价格：¥79.50</p>
+        <p class="score">评分：8.5</p>
+        <ul class="tags"><li>测试</li><li>Selenium</li></ul>
+    </div>
+
+    <div class="book-card" data-id="b6">
+        <h3 class="title"><a href="/book-detail?id=b6">MySQL 是怎样运行的</a></h3>
+        <p class="author">作者：小孩子4919</p>
+        <p class="price">价格：¥99.00</p>
+        <p class="score">评分：9.4</p>
+        <ul class="tags"><li>数据库</li><li>MySQL</li></ul>
+    </div>
+
+</div>
+
+<div class="pagination">
+    <a class="page-link" href="/books-list.html">← 上一页</a>
+    <a class="page-link" href="/book-detail?id=b1">（干扰链接：详情页）</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.demo</groupId>
+    <artifactId>selenium-webmagic-demo</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>selenium-webmagic-demo</name>
+    <description>零基础入门：WebMagic（静态页面）+ Selenium（动态页面）爬虫教学 Demo</description>
+
+    <properties>
+        <!-- 源码编码：Windows 默认 GBK，必须显式指定 UTF-8，否则中文注释/输出会乱码 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!--
+          编译级别说明：
+          - WebMagic 0.7.4 是很老的库（编译目标 Java 7/8），但字节码在 JDK 17 上照样能跑；
+          - Selenium 4.9 之后【不再支持 Java 8】，最低要求 Java 11；
+          所以本工程统一用 Java 17（你本机安装的就是 17）。
+        -->
+        <maven.compiler.release>17</maven.compiler.release>
+
+        <!-- 依赖版本集中管理，改这里即可 -->
+        <webmagic.version>0.7.4</webmagic.version>
+        <selenium.version>4.15.0</selenium.version>
+        <slf4j.version>1.7.36</slf4j.version>
+        <gson.version>2.10.1</gson.version>
+    </properties>
+
+    <dependencies>
+
+        <!-- ===================== 1. WebMagic（Java 爬虫框架） ===================== -->
+        <dependency>
+            <groupId>us.codecraft</groupId>
+            <artifactId>webmagic-core</artifactId>
+            <version>${webmagic.version}</version>
+            <exclusions>
+                <!--
+                  WebMagic 官方把一些测试用的依赖写成了 compile 作用域，会拖进来一大堆没用的包。
+                  这两个跟爬虫运行无关，排除掉可以显著减小依赖体积：
+                -->
+                <exclusion>
+                    <groupId>com.github.dreamhead</groupId>
+                    <artifactId>moco-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-all</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>us.codecraft</groupId>
+            <artifactId>webmagic-extension</artifactId>
+            <version>${webmagic.version}</version>
+            <exclusions>
+                <!-- Redis 相关的去重/队列我们用不到，排除掉 -->
+                <exclusion>
+                    <groupId>redis.clients</groupId>
+                    <artifactId>jedis</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- ===================== 2. Selenium（浏览器自动化） ===================== -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <!-- ===================== 3. 日志 ===================== -->
+        <!--
+          WebMagic 用 slf4j 打日志，但 slf4j 只是一个"门面"，必须配一个具体实现才能在控制台看到日志。
+          slf4j-simple 是最简单的实现，零配置。
+          注意：版本必须和 WebMagic 自带的 slf4j-api 1.7.x 对齐，用 2.x 会报 "No binding found"。
+        -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <!-- ===================== 4. JSON 解析（实战章节用） ===================== -->
+        <!--
+          方案一（接口法）需要解析后端返回的 JSON 字符串。
+          JDK 自带的没有 JSON 库，这里引入 Google 的 gson，体积小、API 简单。
+        -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>crawler-demo</finalName>
+        <plugins>
+
+            <!-- 编译插件：指定 release=17 和 UTF-8 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>17</release>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <!--
+              打包时把所有依赖 jar 复制到 target/lib，
+              这样生成的 crawler-demo.jar 的 MANIFEST 里会带 Class-Path，
+              可以直接 java -jar 运行，不需要手动配 classpath。
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 打 jar 包时写入 Main-Class 和 Class-Path -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.demo.crawler.Main</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- 方便直接用 mvn exec:java 运行，不用先打包 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.demo.crawler.Main</mainClass>
+                    <!-- Windows 控制台默认 GBK，强制用 UTF-8 输出，避免中文乱码 -->
+                    <systemProperties>
+                        <systemProperty>
+                            <key>file.encoding</key>
+                            <value>UTF-8</value>
+                        </systemProperty>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

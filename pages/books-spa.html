@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>示例书店 · 图书列表（动态页面 / JS 渲染）</title>
+    <style>
+        body { font-family: "Microsoft YaHei", sans-serif; background: #f5f7fa; margin: 0; padding: 30px; }
+        h1 { color: #2c3e50; }
+        .tip { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 10px 14px; border-radius: 4px; color: #1b5e20; }
+        .book-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+        .book-card { background: #fff; border-radius: 10px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+        .book-card .title { margin: 0 0 8px; font-size: 18px; color: #2c3e50; }
+        .book-card .author { color: #7f8c8d; font-size: 14px; margin: 6px 0; }
+        .book-card .price { color: #e74c3c; font-weight: bold; font-size: 16px; margin: 6px 0; }
+        .book-card .score { color: #f39c12; font-size: 14px; margin: 6px 0; }
+        .tags { list-style: none; padding: 0; margin: 10px 0 0; }
+        .tags li { display: inline-block; background: #eef3f8; color: #557; font-size: 12px; padding: 3px 8px; border-radius: 10px; margin-right: 6px; }
+        .loading { color: #999; font-style: italic; }
+        #load-more { margin-top: 24px; padding: 10px 22px; background: #4caf50; color: #fff; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; }
+        #load-more:disabled { background: #bdbdbd; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<h1>示例书店 · 图书列表（动态页面）</h1>
+
+<p class="tip">
+    这是一个 <strong>动态页面（SPA）</strong>：打开网页源码（Ctrl+U）你会发现 <code>&lt;div class="book-list"&gt;</code>
+    里面<strong>是空的</strong>，书的数据是浏览器运行 JavaScript 后才"画"上去的。<br>
+    WebMagic 默认的 HTTP 下载器只能拿到 JS 执行<strong>之前</strong>的空壳，所以必须靠
+    <strong>Selenium 启动真实浏览器</strong>把页面跑起来再抓取。
+</p>
+
+<!-- 书卡会被 JS 动态塞进这个容器；初始是空的 -->
+<div class="book-list" id="app">
+    <div class="loading">数据加载中……（这部分由 JS 执行后才出现）</div>
+</div>
+
+<button id="load-more" disabled>加载更多</button>
+
+<script>
+    // 模拟从后端接口返回的书单数据
+    const ALL_BOOKS = [
+        { id: "s1", title: "Java 网络爬虫入门", author: "张三", price: "¥59.80", score: "8.7", tags: ["Java", "爬虫"] },
+        { id: "s2", title: "HTTP 权威指南",       author: "David Gourley", price: "¥109.00", score: "9.1", tags: ["网络", "HTTP"] },
+        { id: "s3", title: "CSS 选择器实战",       author: "李四", price: "¥45.00", score: "7.9", tags: ["前端", "CSS"] },
+        { id: "s4", title: "XPath 从入门到精通",   author: "王五", price: "¥68.00", score: "8.2", tags: ["爬虫", "XPath"] },
+        { id: "s5", title: "Selenium 自动化测试实战", author: "赵六", price: "¥79.50", score: "8.5", tags: ["测试", "Selenium"] },
+        { id: "s6", title: "MySQL 是怎样运行的",   author: "小孩子4919", price: "¥99.00", score: "9.4", tags: ["数据库", "MySQL"] }
+    ];
+
+    let shown = 0;
+
+    // 把一批书渲染成卡片插入页面
+    function render(list) {
+        const app = document.getElementById("app");
+        // 第一次渲染前，清掉"加载中"占位
+        if (shown === 0) app.innerHTML = "";
+        for (const b of list) {
+            const card = document.createElement("div");
+            card.className = "book-card";
+            card.setAttribute("data-id", b.id);
+            card.innerHTML =
+                '<h3 class="title">' + b.title + '</h3>' +
+                '<p class="author">作者：' + b.author + '</p>' +
+                '<p class="price">价格：' + b.price + '</p>' +
+                '<p class="score">评分：' + b.score + '</p>' +
+                '<ul class="tags">' + b.tags.map(t => '<li>' + t + '</li>').join("") + '</ul>';
+            app.appendChild(card);
+        }
+        shown += list.length;
+    }
+
+    // 模拟"打开页面 1.5 秒后才拿到接口数据"，只先显示前 3 本
+    setTimeout(function () {
+        render(ALL_BOOKS.slice(0, 3));
+        document.getElementById("load-more").disabled = false; // 数据到了，才允许点"加载更多"
+    }, 1500);
+
+    // 点击"加载更多"把剩下 3 本也显示出来，然后隐藏按钮
+    document.getElementById("load-more").addEventListener("click", function () {
+        render(ALL_BOOKS.slice(shown));
+        this.style.display = "none";
+    });
+</script>
+
+</body>
+</html>

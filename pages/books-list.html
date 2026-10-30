@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>示例书店 · 图书列表 第 1 页（静态页面）</title>
+    <style>
+        body { font-family: "Microsoft YaHei", sans-serif; background: #f5f7fa; margin: 0; padding: 30px; }
+        h1 { color: #2c3e50; }
+        .tip { background: #fff8e1; border-left: 4px solid #ffc107; padding: 10px 14px; border-radius: 4px; color: #6d5b00; }
+        .book-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+        .book-card { background: #fff; border-radius: 10px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+        .book-card .title { margin: 0 0 8px; font-size: 18px; }
+        .book-card .title a { color: #2c3e50; text-decoration: none; }
+        .book-card .title a:hover { color: #3498db; }
+        .book-card .author { color: #7f8c8d; font-size: 14px; margin: 6px 0; }
+        .book-card .price { color: #e74c3c; font-weight: bold; font-size: 16px; margin: 6px 0; }
+        .book-card .score { color: #f39c12; font-size: 14px; margin: 6px 0; }
+        .tags { list-style: none; padding: 0; margin: 10px 0 0; }
+        .tags li { display: inline-block; background: #eef3f8; color: #557; font-size: 12px; padding: 3px 8px; border-radius: 10px; margin-right: 6px; }
+        .pagination { margin-top: 24px; }
+        .page-link { display: inline-block; padding: 8px 16px; background: #3498db; color: #fff; text-decoration: none; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+<h1>示例书店 · 图书列表</h1>
+
+<p class="tip">
+    这是一个 <strong>静态页面</strong>：数据直接写在 HTML 源码里。<br>
+    你可以按 F12 → 右键页面 → "查看网页源代码"（Ctrl+U），书名、价格等内容<strong>肉眼可见</strong>。<br>
+    这种页面用 WebMagic 默认的 HTTP 下载器就能直接爬，不需要浏览器。
+</p>
+
+<!-- 列表容器：爬虫靠 .book-card 这个 class 定位每一本书 -->
+<div class="book-list">
+
+    <div class="book-card" data-id="b1">
+        <h3 class="title"><a href="/book-detail?id=b1">Java 网络爬虫入门</a></h3>
+        <p class="author">作者：张三</p>
+        <p class="price">价格：¥59.80</p>
+        <p class="score">评分：8.7</p>
+        <ul class="tags"><li>Java</li><li>爬虫</li></ul>
+    </div>
+
+    <div class="book-card" data-id="b2">
+        <h3 class="title"><a href="/book-detail?id=b2">HTTP 权威指南</a></h3>
+        <p class="author">作者：David Gourley</p>
+        <p class="price">价格：¥109.00</p>
+        <p class="score">评分：9.1</p>
+        <ul class="tags"><li>网络</li><li>HTTP</li></ul>
+    </div>
+
+    <div class="book-card" data-id="b3">
+        <h3 class="title"><a href="/book-detail?id=b3">CSS 选择器实战</a></h3>
+        <p class="author">作者：李四</p>
+        <p class="price">价格：¥45.00</p>
+        <p class="score">评分：7.9</p>
+        <ul class="tags"><li>前端</li><li>CSS</li></ul>
+    </div>
+
+</div>
+
+<!-- 分页区：爬虫靠 .pagination a 发现"下一页" -->
+<div class="pagination">
+    <a class="page-link" href="/books-list-2.html">第 2 页 →</a>
+</div>
+
+</body>
+</html>
